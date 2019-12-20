@@ -10,7 +10,7 @@
 #include "RWord.h"
 #include "RSign.h"
 
-mutex mutexS, mutexW, mutexN;
+mutex mutexS, mutexW, mutexN;       
 condition_variable cv,cvN,cvW,cvx;
 
 
