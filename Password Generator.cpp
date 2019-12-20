@@ -10,33 +10,34 @@
 #include "RWord.h"
 #include "RSign.h"
 
-mutex mutexS, mutexW, mutexN;       
+mutex mutexS, mutexW, mutexN; 
 condition_variable cv,cvN,cvW,cvx;
 
 
 using namespace std;
 
 
-char RandomNumber(char& Number)
+char RandomNumber(char& Number)                     //Creating random numbers
 {
 	for (int i = 0; i < 5; i++) {
 		mt19937 gen(random_device().operator()());
 		uniform_int_distribution<int> uid(0, 9);
 		int Num = uid(gen);
-		unique_lock<mutex>lk(mutexN);
+		unique_lock<mutex>lk(mutexN);       //Blocking the acess to the Number variable
 		cvN.wait(lk);
 		Number = (Num + '0');
 		lk.unlock();
 		}
 	return Number;
 }
-void Password( string&Word1 , char&Sign1 ,  char&Number) {
+void Password( string&Word1 , char&Sign1 ,  char&Number) {          
 	for (int i = 0; i < 6; i++) {
 		unique_lock<mutex>lW(mutexW);
-		string SW = Word1;
+		string SW = Word1;                          //In order to less block the Word1, we create a new string type variable
 		lW.unlock();
 		cvW.notify_one();
-		size_t WordSize = SW.size();
+
+		size_t WordSize = SW.size();                //Randomly choosing the places for the random number and sign
 		srand(time(0));
 		int SignPlace = (rand() % WordSize);
 		int NumberPlace = (rand() % WordSize);
@@ -51,7 +52,8 @@ void Password( string&Word1 , char&Sign1 ,  char&Number) {
 		lN.unlock();
 		cvN.notify_one();
 		
-		cout << SW << endl<<endl;
+		cout << SW << endl<<endl;        //exept of printing the passwords can stringht be inserted in the set to avoid 
+		                                 //the same password appearence
 		
 
 	}
@@ -59,30 +61,19 @@ void Password( string&Word1 , char&Sign1 ,  char&Number) {
 
 
 
-
-
-
-
-
-
 int main()
 {
 	
-	
-	string Word1 = "";
-	RWord A;
-	A.SetMap();
-	A.GetMap();
-	A.GetCategory();
-	
-	RSign B;
 	char Sign1;
+    char Number;
+	string Word1 = "";
 
+	RWord A;                         //Setting the map, asking the user to select the category and then filling the map
+	A.SetMap();
+	A.GetCategory();
+	RSign B;
 	
-	char Number;
-	
-	
-	Number = '1';
+	Number = '1';                     //This variable we need to activate the thread t3, couse it is the main blocking thread
 	Sign1 = '@';
 	Word1 = "September";
 	
